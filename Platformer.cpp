@@ -14,7 +14,7 @@ int main(){
     bool canJump;
     Player.SetOnCollisionCallback([&yVel, &canJump](CollisionData data) {
         if (data.overlapY < data.overlapX ){
-            // Player hit ground
+            // Player hit groun
             yVel = 0;
             canJump = true;
         }
