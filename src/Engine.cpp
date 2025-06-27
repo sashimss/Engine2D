@@ -89,6 +89,9 @@ void Engine::HandleCollisions() {
 void Engine::Render() {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
+    for (GameObject* object : m_visibleObjects){
+        DrawGameObject(*object, object->GetColor());
+    }
 }
 
 void Engine::Present() {

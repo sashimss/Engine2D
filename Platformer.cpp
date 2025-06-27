@@ -7,9 +7,12 @@ int main(){
     if (!engine.Init("Platformer", 800, 600)){
         return -1;
     }
+    const SDL_Color RED = {255, 0, 0, 255};
+    const SDL_Color BLUE = {0, 0, 255, 255};
+    const SDL_Color GREEN = {0, 255, 0, 255};
     
     // <----Player---->
-    GameObject Player = GameObject(engine, 100, 100, 10, 20, true);
+    GameObject Player = GameObject(engine, 100, 400, 10, 20, RED, true);
     float yVel = 0, speed_multiplier = 1;
     bool canJump;
     Player.SetOnCollisionCallback([&yVel, &canJump](CollisionData data) {
@@ -20,17 +23,22 @@ int main(){
         }
     });
 
-    // <----Ground---->
-    GameObject Ground = GameObject(engine, 0, 500, 800, 100, true);
-    Ground.isStatic(true);
-    Ground.SetTag("Ground");
-
-    // <----Obstacle---->
-    GameObject obstacle = GameObject(engine, 300, 450, 20, 50, true);
-    obstacle.isStatic(true);
-    
-    const SDL_Color RED = {255, 0, 0, 255};
-    // const int GROUNDLEVEL = 500-Player.GetScale().y;
+    // <----Level Statics---->
+    GameObject level_statics[] = {
+        GameObject(engine, 0, 500, 200, 100, GREEN, true),
+        GameObject(engine, 300, 500, 300, 100, GREEN, true),
+        GameObject(engine, 650, 400, 100, 20, GREEN, true),
+        GameObject(engine, 500, 300, 100, 20, GREEN, true),
+        GameObject(engine, 300, 350, 100, 20, GREEN, true),
+        GameObject(engine, 150, 300, 60, 20, GREEN, true),
+        GameObject(engine, 50, 200, 60, 20, GREEN, true),
+        GameObject(engine, 190, 120, 200, 30, GREEN, true),
+        GameObject(engine, 480, 120, 200, 30, GREEN, true),
+    };
+    for (GameObject& obstacle : level_statics) {
+        obstacle.isStatic(true);
+    }
+    GameObject box = GameObject(engine, 400, 470, 30, 30, BLUE, true);
 
     auto PlayerControls = [&]() {
         if (engine.IsKeyPressed(SDL_SCANCODE_RSHIFT)){
@@ -58,20 +66,17 @@ int main(){
     while (engine.IsRunning()){
         engine.HandleEvents();
         engine.Update();
-        engine.Render();
-
+        
         PlayerControls();
-        ApplyGravity();        
-
+        ApplyGravity();    
+        if (Player.GetPosition().y > 900){
+            Player.SetPosition(100, 400);
+            yVel=0;
+        }    
+        
         engine.HandleCollisions();
-
-        // Draw Ground
-        engine.DrawGameObject(Ground, {0, 255, 0, 255});
-        // Draw Player
-        engine.DrawGameObject(Player, RED);
-        //DrawObstacle
-        engine.DrawGameObject(obstacle, {0, 0, 255, 255});
-
+        
+        engine.Render();
         engine.Present();
         engine.LimitFPS();
     }

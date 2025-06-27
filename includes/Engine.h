@@ -26,6 +26,9 @@ class Engine {
         bool IsKeyPressed(int key);
         float GetDeltaTime();
 
+        void AddVisibleObject(GameObject* object) {m_visibleObjects.push_back(object);}
+        void RemoveVisibleObject(GameObject* object) {m_visibleObjects.remove(object);}
+
         void AddSolidObject(GameObject* object) {m_solidObjects.push_back(object);}
         void RemoveSolidObject(GameObject* object) {m_solidObjects.remove(object);}
 
@@ -40,6 +43,7 @@ class Engine {
         float deltaTime;
         Uint32 frameStart;
 
+        std::list<GameObject*> m_visibleObjects;
         std::list<GameObject*> m_solidObjects;
 };
 
