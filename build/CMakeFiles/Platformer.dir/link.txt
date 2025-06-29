@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/Platformer.dir/Platformer.cpp.o CMakeFiles/Platformer.dir/src/Engine.cpp.o CMakeFiles/Platformer.dir/src/GameObject.cpp.o -o Platformer  /usr/lib/x86_64-linux-gnu/libSDL2.so 

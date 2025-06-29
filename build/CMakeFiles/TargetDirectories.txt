@@ -1,0 +1,3 @@
+/home/sassya/Documents/Engine/build/CMakeFiles/Platformer.dir
+/home/sassya/Documents/Engine/build/CMakeFiles/edit_cache.dir
+/home/sassya/Documents/Engine/build/CMakeFiles/rebuild_cache.dir

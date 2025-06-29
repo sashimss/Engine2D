@@ -54,14 +54,16 @@ class GameObject{
         void SetOnCollisionCallback(std::function<void(CollisionData data)> callback) {
             m_onCollisionCallback = callback;
         }
-        void OnCollision(CollisionData data){
+        virtual void OnCollision(CollisionData data){
             if (m_onCollisionCallback){
                 m_onCollisionCallback(data);
             }
         }
+
+    protected:
+        Engine& engine;
         
     private:
-        Engine& engine;
         std::string m_tag;
         Vector2 m_position;
         Vector2 m_scale;

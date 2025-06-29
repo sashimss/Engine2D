@@ -1,6 +1,47 @@
 #include <iostream>
 #include "Engine.h"
 
+class CPlayer : public GameObject {
+    public:
+        using GameObject::GameObject;
+
+        float yVel=0;
+        float speed_multiplier=1;
+        bool canJump;
+        void OnCollision (CollisionData data) override {
+            if (data.overlapY < data.overlapX ){
+                // Player hit ground
+                yVel = 0;
+                canJump = true;
+            }
+        }
+        void Controls(){
+            if (engine.IsKeyPressed(SDL_SCANCODE_RSHIFT)){
+                speed_multiplier = 2;
+            } else {
+                speed_multiplier = 1;
+            }
+            if (engine.IsKeyPressed(SDL_SCANCODE_RIGHT)){
+                Move(100*speed_multiplier, 0, engine.GetDeltaTime());
+            }
+            if (engine.IsKeyPressed(SDL_SCANCODE_LEFT)){
+                Move(-100*speed_multiplier, 0, engine.GetDeltaTime());
+            }
+            if (engine.IsKeyPressed(SDL_SCANCODE_UP) && canJump){
+                yVel = -500;
+                canJump = false;
+            }
+        }
+        void Update(){
+            yVel += 980.0f * engine.GetDeltaTime();
+            Move(0, yVel, engine.GetDeltaTime());
+
+            if (GetPosition().y > 900){
+                SetPosition(100, 400);
+                yVel=0;
+            }   
+        }
+};
 
 int main(){
     Engine engine;
@@ -12,16 +53,7 @@ int main(){
     const SDL_Color GREEN = {0, 255, 0, 255};
     
     // <----Player---->
-    GameObject Player = GameObject(engine, 100, 400, 10, 20, RED, true);
-    float yVel = 0, speed_multiplier = 1;
-    bool canJump;
-    Player.SetOnCollisionCallback([&yVel, &canJump](CollisionData data) {
-        if (data.overlapY < data.overlapX ){
-            // Player hit ground
-            yVel = 0;
-            canJump = true;
-        }
-    });
+    CPlayer Player(engine, 100, 400, 10, 20, RED, true);
 
     // <----Level Statics---->
     GameObject level_statics[] = {
@@ -40,40 +72,13 @@ int main(){
     }
     GameObject box = GameObject(engine, 400, 470, 30, 30, BLUE, true);
 
-    auto PlayerControls = [&]() {
-        if (engine.IsKeyPressed(SDL_SCANCODE_RSHIFT)){
-            speed_multiplier = 2;
-        } else {
-            speed_multiplier = 1;
-        }
-        if (engine.IsKeyPressed(SDL_SCANCODE_RIGHT)){
-            Player.Move(100*speed_multiplier, 0, engine.GetDeltaTime());
-        }
-        if (engine.IsKeyPressed(SDL_SCANCODE_LEFT)){
-            Player.Move(-100*speed_multiplier, 0, engine.GetDeltaTime());
-        }
-        if (engine.IsKeyPressed(SDL_SCANCODE_UP) && canJump){
-            yVel = -500;
-            canJump = false;
-        }
-    };
-
-    auto ApplyGravity = [&]() {
-        yVel += 980.0f * engine.GetDeltaTime();
-        Player.Move(0, yVel, engine.GetDeltaTime());
-    };
-
     while (engine.IsRunning()){
         engine.HandleEvents();
         engine.Update();
         
-        PlayerControls();
-        ApplyGravity();    
-        if (Player.GetPosition().y > 900){
-            Player.SetPosition(100, 400);
-            yVel=0;
-        }    
-        
+        Player.Controls();
+        Player.Update();
+
         engine.HandleCollisions();
         
         engine.Render();
