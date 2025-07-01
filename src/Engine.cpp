@@ -1,7 +1,8 @@
 #include "Engine.h"
+#include "Physics.h"
 #include <iostream>
 
-Engine::Engine() : window(nullptr), renderer(nullptr), isRunning(false), FPS(60), lastFrameTime(0) {}
+Engine::Engine() : window(nullptr), renderer(nullptr), isRunning(false), FPS(60), lastFrameTime(0), PhysicsEngine(this) {}
 
 Engine::~Engine() {
     Cleanup();
@@ -44,49 +45,14 @@ void Engine::Update () {
     frameStart = SDL_GetTicks();
     deltaTime = (frameStart - lastFrameTime) / 1000.0f;
     lastFrameTime = frameStart;
+
+    PhysicsEngine.ApplyGravity();
     // Game logic
 }
 
-void Engine::HandleCollisions() {
-    Vector2 pos_a, pos_b, scale_a, scale_b;
-    for (GameObject* a : m_solidObjects){
-        if (a->isStatic()){ continue; }
-        for (GameObject* b : m_solidObjects){
-            if (a != b){
-                pos_a = a->GetPosition(), pos_b = b->GetPosition();
-                scale_a = a->GetScale(), scale_b = b->GetScale();
-                int sign;
-                
-                float overlapX = pos_a.x < pos_b.x ? pos_a.x+scale_a.x-pos_b.x : pos_b.x+scale_b.x-pos_a.x;
-                float overlapY = pos_a.y < pos_b.y ? pos_a.y+scale_a.y-pos_b.y : pos_b.y+scale_b.y-pos_a.y;
-                // Check if collides
-                if (overlapX > 0 && overlapY > 0){
-                    if (overlapY > overlapX){
-                        sign = pos_a.x < pos_b.x ? 1 : -1;
-                        if (b->isStatic()){
-                            a->SetPosition(pos_a - Vector2(overlapX*sign, 0));
-                        } else {
-                            a->SetPosition((pos_a - Vector2(overlapX*sign, 0)/2));
-                            b->SetPosition((pos_b + Vector2(overlapX*sign, 0)/2));
-                        }
-                    } else {
-                        sign = pos_a.y < pos_b.y ? 1 : -1;
-                        if (b->isStatic()){
-                            a->SetPosition(pos_a - Vector2(0, overlapY*sign));
-                        } else {
-                            a->SetPosition((pos_a - Vector2(0, overlapY*sign)/2));
-                            b->SetPosition((pos_b + Vector2(0, overlapY*sign)/2));
-                        }
-                    }
-                    a->OnCollision({b, overlapX, overlapY});
-                    b->OnCollision({a, overlapX, overlapY});
-                }
-            }
-        }
-    }
-}
-
 void Engine::Render() {
+    PhysicsEngine.HandleCollision();
+
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
     for (GameObject* object : m_visibleObjects){

@@ -5,13 +5,11 @@ class CPlayer : public GameObject {
     public:
         using GameObject::GameObject;
 
-        float yVel=0;
         float speed_multiplier=1;
         bool canJump;
         void OnCollision (CollisionData data) override {
             if (data.overlapY < data.overlapX ){
                 // Player hit ground
-                yVel = 0;
                 canJump = true;
             }
         }
@@ -28,18 +26,16 @@ class CPlayer : public GameObject {
                 Move(-100*speed_multiplier, 0, engine.GetDeltaTime());
             }
             if (engine.IsKeyPressed(SDL_SCANCODE_UP) && canJump){
-                yVel = -500;
+                physicsComponent->velocity.y = -500;
                 canJump = false;
             }
         }
         void Update(){
-            yVel += 980.0f * engine.GetDeltaTime();
-            Move(0, yVel, engine.GetDeltaTime());
-
+            Move(GetPhysicsComponent()->velocity, engine.GetDeltaTime());
             if (GetPosition().y > 900){
                 SetPosition(100, 400);
-                yVel=0;
-            }   
+                physicsComponent->velocity.y = 0;
+            }  
         }
 };
 
@@ -54,6 +50,8 @@ int main(){
     
     // <----Player---->
     CPlayer Player(engine, 100, 400, 10, 20, RED, true);
+    PhysicsComponent PlayerPhysicsComponent(Player, 1);
+    Player.SetPhysicsComponent(&PlayerPhysicsComponent);
 
     // <----Level Statics---->
     GameObject level_statics[] = {
@@ -78,8 +76,6 @@ int main(){
         
         Player.Controls();
         Player.Update();
-
-        engine.HandleCollisions();
         
         engine.Render();
         engine.Present();

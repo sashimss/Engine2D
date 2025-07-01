@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 #include "GameObject.h"
 #include "Vector2.h"
+#include "Physics.h"
 
 class Engine {
     public :
@@ -14,7 +15,6 @@ class Engine {
         bool Init(const char* title, int width, int height);
         void Update();
         void HandleEvents();
-        void HandleCollisions();
         void Cleanup();
         void Render();
         void Present();
@@ -29,8 +29,11 @@ class Engine {
         void AddVisibleObject(GameObject* object) {m_visibleObjects.push_back(object);}
         void RemoveVisibleObject(GameObject* object) {m_visibleObjects.remove(object);}
 
-        void AddSolidObject(GameObject* object) {m_solidObjects.push_back(object);}
-        void RemoveSolidObject(GameObject* object) {m_solidObjects.remove(object);}
+        void AddSolidBody(GameObject* object) {PhysicsEngine.AddSolidBody(object);}
+        void RemoveSolidBody(GameObject* object) {PhysicsEngine.RemoveSolidBody(object);}
+
+        void AddRigidBody(GameObject* object) {PhysicsEngine.AddRigidBody(object);}
+        void RemoveRigidBody(GameObject* object) {PhysicsEngine.RemoveRigidBody(object);}
 
 
     private :
@@ -43,8 +46,9 @@ class Engine {
         float deltaTime;
         Uint32 frameStart;
 
+        Physics PhysicsEngine;
+
         std::list<GameObject*> m_visibleObjects;
-        std::list<GameObject*> m_solidObjects;
 };
 
 

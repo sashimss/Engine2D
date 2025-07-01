@@ -2,6 +2,7 @@
 #define GAMEOBJECT_H
 
 #include "Vector2.h"
+#include "PhysicsComponent.h"
 #include <iostream>
 #include <functional>
 #include <SDL2/SDL.h>
@@ -51,6 +52,9 @@ class GameObject{
         bool isStatic() const {return m_isStatic;}
         void isStatic(bool val) {m_isStatic = val;}
 
+        void SetPhysicsComponent(PhysicsComponent* com);
+        PhysicsComponent* GetPhysicsComponent() const { return physicsComponent;}
+
         void SetOnCollisionCallback(std::function<void(CollisionData data)> callback) {
             m_onCollisionCallback = callback;
         }
@@ -62,6 +66,7 @@ class GameObject{
 
     protected:
         Engine& engine;
+        PhysicsComponent* physicsComponent;
         
     private:
         std::string m_tag;
@@ -70,6 +75,7 @@ class GameObject{
         SDL_Color m_color;
         bool m_isSolid;
         bool m_isStatic = false;
+
         std::function<void(CollisionData data)> m_onCollisionCallback;
     };
     

@@ -12,6 +12,7 @@ add_executable(Platformer
     Platformer.cpp
     src/Engine.cpp
     src/GameObject.cpp
+    src/Physics.cpp
 )
 
 target_include_directories(Platformer PUBLIC
